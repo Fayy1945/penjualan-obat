@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kelola Stok & Barang</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333333;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Navbar Utama */
+        .navbar {
+            text-align: center;
+            padding: 10px;
+            background-color: #ffffff;
+            border-bottom: 2px solid #cccccc;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .nav-title {
+            font-size: 25px;
+            font-weight: bold;
+            padding-bottom: 15px;
+            color: #1b048f;
+        }
+        .nav-link {
+            margin: 5px;
+            text-decoration: none;
+            color: #1b048f;
+            border: 1px solid #1b048f;
+            border-radius: 10px;
+            padding: 6px 10px;
+            font-weight: bold;
+            display: inline-block;
+        }
+        .nav-link.active, .nav-link:hover {
+            color: white;
+            background-color: #1b048f;
+        }
+
+        /* Sub-Navbar */
+        .sub-navbar {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            background-color: #e8ebfc;
+            padding: 8px;
+            border-bottom: 1px solid #d0d5f7;
+            flex-wrap: wrap;
+        }
+        .sub-nav-btn {
+            background-color: #ffffff;
+            color: #1b048f;
+            border: 1px solid #1b048f;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 13px;
+        }
+        .sub-nav-btn.active, .sub-nav-btn:hover {
+            background-color: #1b048f;
+            color: #ffffff;
+        }
+
+        /* Container */
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 0 15px 40px 15px;
+        }
+        .card-table, .card-form {
+            background-color: #ffffff;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            border: 1px solid #e0e0e0;
+            margin-bottom: 20px;
+        }
+        
+        /* Form Styling */
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            font-size: 14px;
+            margin-bottom: 5px;
+            color: #1b048f;
+        }
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+        .btn-submit {
+            background-color: #1b048f;
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 14px;
+            width: 100%;
+        }
+        .btn-submit:hover {
+            background-color: #14026e;
+        }
+
+        /* KHUSUS TABEL DAFTAR STOK (RINGKAS & PADAT) */
+        .table-responsive {
+            overflow-x: auto;
+        }
+        .table-stok-ringkas {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+        .table-stok-ringkas th, 
+        .table-stok-ringkas td {
+            padding: 5px 8px;
+            border-bottom: 1px solid #eeeeee;
+            font-size: 12px;
+        }
+        .table-stok-ringkas th {
+            background-color: #f8f9fa;
+            color: #1b048f;
+            font-size: 12px;
+        }
+        .input-stock-small {
+            width: 50px;
+            padding: 3px 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            text-align: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .btn-save-small {
+            background-color: #1b048f;
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 11px;
+        }
+        .btn-save-small:hover {
+            background-color: #14026e;
+        }
+
+        /* Section Visibility */
+        .section-tab {
+            display: none;
+        }
+        .section-tab.active {
+            display: block;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 15px 10px;
+            background-color: #ffffff;
+            border-top: 1px solid #e0e0e0;
+            color: #666666;
+            font-size: 13px;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar Utama -->
+    <div class="navbar">
+        <div class="nav-title">Data Transaksi</div>
+        <a href="index.html" class="nav-link">Produk</a>
+        <a href="riwayat.html" class="nav-link">Riwayat</a>
+        <a href="modal.html" class="nav-link">Cost</a>
+        <a href="stok.html" class="nav-link active">Stok</a>
+    </div>
+
+    <!-- Sub-Navbar -->
+    <div class="sub-navbar">
+        <button class="sub-nav-btn active" onclick="switchSubTab('daftar-stok', this)">📋 Daftar Stok</button>
+        <button class="sub-nav-btn" onclick="switchSubTab('tambah-barang', this)">➕ Tambah Barang</button>
+        <button class="sub-nav-btn" onclick="switchSubTab('edit-harga', this)">💰 Ubah Harga & Modal</button>
+    </div>
+
+    <div class="container">
+        
+        <!-- TAB 1: DAFTAR STOK RINGKAS -->
+        <div id="daftar-stok" class="section-tab active">
+            <div class="card-table">
+                <h3 style="margin-top: 0; color: #1b048f; font-size: 16px;">Kelola Stok Barang</h3>
+                <div class="table-responsive">
+                    <table class="table-stok-ringkas">
+                        <thead>
+                            <tr>
+                                <th>Nama</th>
+                                <th style="text-align: center; width: 90px;">Jumlah</th>
+                                <th style="text-align: center; width: 80px;">Simpan</th>
+                            </tr>
+                        </thead>
+                        <tbody id="stok-list"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: TAMBAH BARANG BARU -->
+        <div id="tambah-barang" class="section-tab">
+            <div class="card-form">
+                <h3 style="margin-top: 0; color: #1b048f;">Form Tambah Barang Baru</h3>
+                <form onsubmit="tambahBarangBaru(event)">
+                    <div class="form-group">
+                        <label>Nama Obat</label>
+                        <input type="text" id="add-name" class="form-control" placeholder="Contoh: Amoxcillin" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Kemasan / Deskripsi</label>
+                        <input type="text" id="add-desc" class="form-control" placeholder="Contoh: 1 Strip / 1 Pack" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Harga Jual (Rp)</label>
+                        <input type="number" id="add-price" class="form-control" placeholder="Contoh: 15000" required min="1">
+                    </div>
+                    <div class="form-group">
+                        <label>Modal / HPP (Rp)</label>
+                        <input type="number" id="add-cost" class="form-control" placeholder="Contoh: 12000" required min="1">
+                    </div>
+                    <div class="form-group">
+                        <label>Stok Awal (Pcs)</label>
+                        <input type="number" id="add-stock" class="form-control" placeholder="Contoh: 50" required min="0">
+                    </div>
+                    <button type="submit" class="btn-submit">Simpan Barang Baru</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- TAB 3: UBAH HARGA & MODAL -->
+        <div id="edit-harga" class="section-tab">
+            <div class="card-form">
+                <h3 style="margin-top: 0; color: #1b048f;">Ubah Harga Jual & Modal</h3>
+                <form onsubmit="simpanEditHarga(event)">
+                    <div class="form-group">
+                        <label>Pilih Obat</label>
+                        <select id="edit-select-id" class="form-control" onchange="loadHargaModalForm()" required>
+                            <option value="">-- Pilih Obat --</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Harga Jual Baru (Rp)</label>
+                        <input type="number" id="edit-price" class="form-control" placeholder="0" required min="1">
+                    </div>
+                    <div class="form-group">
+                        <label>Modal / HPP Baru (Rp)</label>
+                        <input type="number" id="edit-cost" class="form-control" placeholder="0" required min="1">
+                    </div>
+                    <button type="submit" class="btn-submit">Update Harga & Modal</button>
+                </form>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="footer">
+        <p>&copy; 2026 Aplikasi Kasir Obat By Fairly Aryasatya. All rights reserved.</p>
+    </div>
+
+    <script>
+        function switchSubTab(tabId, btn) {
+            document.querySelectorAll('.section-tab').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.sub-nav-btn').forEach(el => el.classList.remove('active'));
+
+            document.getElementById(tabId).classList.add('active');
+            btn.classList.add('active');
+
+            if (tabId === 'edit-harga') {
+                populateDropdownEdit();
+            }
+        }
+
+        function renderStok() {
+            let products = JSON.parse(localStorage.getItem("data_produk_obat")) || [];
+            const tbody = document.getElementById("stok-list");
+            tbody.innerHTML = "";
+
+            if (products.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; padding:10px;">Belum ada data produk.</td></tr>`;
+                return;
+            }
+
+            // Opsi Tambahan: Mengurutkan produk berdasar nama (A-Z)
+            products.sort((a, b) => a.name.localeCompare(b.name, 'id', { sensitivity: 'base' }));
+
+            products.forEach(product => {
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+                    <td>
+                        <strong>${product.name}</strong><br>
+                        <span style="color:#777; font-size:10px;">${product.desc}</span>
+                    </td>
+                    <td style="text-align:center;">
+                        <input type="number" id="stock-val-${product.id}" class="input-stock-small" value="${product.stock}" min="0">
+                    </td>
+                    <td style="text-align:center;">
+                        <button class="btn-save-small" onclick="simpanStok(${product.id})">Simpan</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function simpanStok(productId) {
+            const input = document.getElementById(`stock-val-${productId}`);
+            const newStock = parseInt(input.value);
+
+            if (isNaN(newStock) || newStock < 0) {
+                alert("Masukkan jumlah stok yang valid (minimal 0).");
+                return;
+            }
+
+            let products = JSON.parse(localStorage.getItem("data_produk_obat")) || [];
+            const index = products.findIndex(p => p.id === productId);
+
+            if (index !== -1) {
+                products[index].stock = newStock;
+                localStorage.setItem("data_produk_obat", JSON.stringify(products));
+                alert(`Stok ${products[index].name} diperbarui menjadi ${newStock}!`);
+                renderStok();
+            }
+        }
+
+        // --- FUNGSI CATAT KE COST / MODAL ---
+        function catatKeCost(keterangan, totalCost, tipe) {
+            let riwayatCost = JSON.parse(localStorage.getItem("riwayat_cost")) || [];
+            
+            const now = new Date();
+            const tanggalStr = now.toLocaleDateString('id-ID', {
+                day: '2-digit', month: 'short', year: 'numeric',
+                hour: '2-digit', minute: '2-digit'
+            });
+
+            const costEntry = {
+                id: Date.now(),
+                tanggal: tanggalStr,
+                keterangan: keterangan,
+                amount: totalCost,
+                tipe: tipe // 'Barang Baru' atau 'Update Modal'
+            };
+
+            riwayatCost.unshift(costEntry);
+            localStorage.setItem("riwayat_cost", JSON.stringify(riwayatCost));
+        }
+
+        function tambahBarangBaru(e) {
+            e.preventDefault();
+            let products = JSON.parse(localStorage.getItem("data_produk_obat")) || [];
+
+            const name = document.getElementById("add-name").value.trim();
+            const desc = document.getElementById("add-desc").value.trim();
+            const price = parseInt(document.getElementById("add-price").value);
+            const cost = parseInt(document.getElementById("add-cost").value);
+            const stock = parseInt(document.getElementById("add-stock").value);
+
+            const maxId = products.reduce((max, p) => p.id > max ? p.id : max, 0);
+            const newId = maxId + 1;
+
+            const newProduct = { id: newId, name, desc, price, cost, stock };
+            products.push(newProduct);
+
+            localStorage.setItem("data_produk_obat", JSON.stringify(products));
+
+            // CATAT PENGELUARAN MODAL AWAL KE MENU COST
+            const totalModalAwal = cost * stock;
+            const infoCost = `Modal Awal Produk Baru: ${name} (${stock} pcs @ Rp ${cost.toLocaleString('id-ID')})`;
+            catatKeCost(infoCost, totalModalAwal, "Barang Baru");
+
+            alert(`Barang "${name}" Berhasil ditambahkan!`);
+
+            e.target.reset();
+            renderStok();
+            switchSubTab('daftar-stok', document.querySelectorAll('.sub-nav-btn')[0]);
+        }
+
+        function populateDropdownEdit() {
+            let products = JSON.parse(localStorage.getItem("data_produk_obat")) || [];
+            const select = document.getElementById("edit-select-id");
+            select.innerHTML = `<option value="">-- Pilih Obat --</option>`;
+
+            // Urutkan dropdown sesuai abjad A-Z
+            products.sort((a, b) => a.name.localeCompare(b.name, 'id', { sensitivity: 'base' }));
+
+            products.forEach(p => {
+                const opt = document.createElement("option");
+                opt.value = p.id;
+                opt.textContent = `${p.name} (${p.desc})`;
+                select.appendChild(opt);
+            });
+        }
+
+        function loadHargaModalForm() {
+            const id = parseInt(document.getElementById("edit-select-id").value);
+            const products = JSON.parse(localStorage.getItem("data_produk_obat")) || [];
+            const product = products.find(p => p.id === id);
+
+            if (product) {
+                document.getElementById("edit-price").value = product.price;
+                document.getElementById("edit-cost").value = product.cost;
+            } else {
+                document.getElementById("edit-price").value = "";
+                document.getElementById("edit-cost").value = "";
+            }
+        }
+
+        function simpanEditHarga(e) {
+            e.preventDefault();
+            const id = parseInt(document.getElementById("edit-select-id").value);
+            const newPrice = parseInt(document.getElementById("edit-price").value);
+            const newCost = parseInt(document.getElementById("edit-cost").value);
+
+            let products = JSON.parse(localStorage.getItem("data_produk_obat")) || [];
+            const index = products.findIndex(p => p.id === id);
+
+            if (index !== -1) {
+                const modalLama = products[index].cost;
+                const namaProduk = products[index].name;
+
+                products[index].price = newPrice;
+                products[index].cost = newCost;
+
+                localStorage.setItem("data_produk_obat", JSON.stringify(products));
+
+                // CATAT PERUBAHAN MODAL KE MENU COST (JIKA MODAL BERUBAH)
+                if (modalLama !== newCost) {
+                    const infoCost = `Penyesuaian Modal ${namaProduk}: dari Rp ${modalLama.toLocaleString('id-ID')} jadi Rp ${newCost.toLocaleString('id-ID')}`;
+                    catatKeCost(infoCost, newCost, "Update Modal");
+                }
+
+                alert(`Harga & Modal untuk "${namaProduk}" diperbarui dan tercatat di menu Cost!`);
+                
+                e.target.reset();
+                renderStok();
+                switchSubTab('daftar-stok', document.querySelectorAll('.sub-nav-btn')[0]);
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", renderStok);
+    </script>
+</body>
+</html>

@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Penjualan Obat</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333333;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Navbar */
+        .navbar {
+            text-align: center;
+            padding: 10px;
+            background-color: #ffffff;
+            border-bottom: 2px solid #cccccc;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .nav-title {
+            font-size: 25px;
+            font-weight: bold;
+            padding-bottom: 15px;
+            color: #1b048f;
+        }
+        .nav-link {
+            margin: 5px;
+            text-decoration: none;
+            color: #1b048f;
+            border: 1px solid #1b048f;
+            border-radius: 10px;
+            padding: 6px 10px;
+            font-weight: bold;
+            display: inline-block;
+        }
+        .nav-link.active, .nav-link:hover {
+            color: white;
+            background-color: #1b048f;
+        }
+
+        /* Container Menu & Card */
+        .menu-container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 0 15px 100px 15px;
+        }
+        .store-input-container {
+            margin-bottom: 15px;
+        }
+        .store-input {
+            width: 100%;
+            padding: 12px 16px;
+            font-size: 15px;
+            border: 2px solid #1b048f;
+            border-radius: 10px;
+            box-sizing: border-box;
+            outline: none;
+            font-weight: bold;
+            color: #1b048f;
+            background-color: #ffffff;
+        }
+
+        /* Search Bar Container */
+        .filter-container {
+            margin-bottom: 20px;
+        }
+        .search-input {
+            width: 100%;
+            padding: 12px 16px;
+            font-size: 14px;
+            border: 1px solid #cccccc;
+            border-radius: 10px;
+            outline: none;
+            box-sizing: border-box;
+            background-color: #ffffff;
+        }
+        .search-input:focus {
+            border-color: #1b048f;
+        }
+
+        .card {
+            background-color: #ffffff;
+            border-radius: 12px;
+            padding: 18px 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            border: 1px solid #e0e0e0;
+        }
+        .card-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 0 0 4px 0;
+            color: #222;
+        }
+        .card-desc {
+            font-size: 13px;
+            color: #666;
+            margin: 0 0 6px 0;
+        }
+        .card-stock {
+            font-size: 12px;
+            font-weight: bold;
+            color: #e67e22;
+            margin-bottom: 8px;
+        }
+        .card-price {
+            font-size: 15px;
+            font-weight: bold;
+            color: #1b048f;
+            margin-bottom: 12px;
+        }
+        .qty-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .qty-btn {
+            background-color: #eeeeee;
+            border: 1px solid #ccc;
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .qty-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+        .qty-number {
+            font-size: 15px;
+            font-weight: bold;
+            min-width: 20px;
+            text-align: center;
+        }
+
+        /* Bar Checkout Melayang */
+        .checkout-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: #ffffff;
+            border-top: 1px solid #dddddd;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 -4px 10px rgba(0,0,0,0.05);
+        }
+        .total-text {
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .total-price {
+            color: #1b048f;
+            font-size: 18px;
+        }
+        .btn-confirm {
+            background-color: #1b048f;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 15px;
+            cursor: pointer;
+        }
+        .btn-confirm:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        /* Styling Footer */
+        .footer {
+            text-align: center;
+            padding: 15px 10px;
+            background-color: #ffffff;
+            border-top: 1px solid #e0e0e0;
+            color: #666666;
+            font-size: 13px;
+            margin-top: 30px;
+        }
+        /* Khusus index.html (agar tidak tertutup checkout-bar) */
+        .index-footer {
+            margin-bottom: 70px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="navbar">
+        <div class="nav-title">Data Transaksi</div>
+        <a href="index.html" class="nav-link active">Produk</a>
+        <a href="riwayat.html" class="nav-link">Riwayat</a>
+        <a href="modal.html" class="nav-link">Cost</a>
+        <a href="stok.html" class="nav-link">Stok</a>
+    </div>
+
+    <div class="menu-container">
+        <div class="store-input-container">
+            <input type="text" id="store-name" class="store-input" placeholder="Masukkan nama toko / pelanggan..." oninput="saveStoreName()">
+        </div>
+
+        <!-- Search Bar Saja -->
+        <div class="filter-container">
+            <input type="text" id="search-product" class="search-input" placeholder="Cari obat..." oninput="renderProducts()">
+        </div>
+
+        <div id="menu-grid"></div>
+    </div>
+
+    <div class="footer index-footer">
+        <p>&copy; 2026 Aplikasi Kasir Obat By Fairly Aryasatya. All rights reserved.</p>
+    </div>
+
+    <div class="checkout-bar">
+        <div class="total-text">Total: <span id="total-price" class="total-price">Rp0</span></div>
+        <button id="btn-confirm" class="btn-confirm" onclick="konfirmasiPesanan()" disabled>Konfirmasi Pesanan</button>
+    </div>
+
+    <script>
+        const initialProducts = [
+            { id: 1, name: "Antalgin", desc: "1 Strip.", price: 4000, cost: 3000, stock: 50 },
+            { id: 2, name: "Antangin Dewasa", desc: "1 Pack.", price: 41000, cost: 39000, stock: 30 },
+            { id: 3, name: "Antangin Anak", desc: "1 Pack.", price: 11000, cost: 10500, stock: 30 },
+            { id: 4, name: "Antimo", desc: "1 Papan.", price: 6000, cost: 5500, stock: 40 },
+            { id: 5, name: "Bejo", desc: "1 Pack.", price: 31000, cost: 29000, stock: 25 },
+            { id: 6, name: "Bodrex", desc: "1 Pack.", price: 10000, cost: 8750, stock: 50 },
+            { id: 7, name: "Bodrex Extra", desc: "1 Strip.", price: 3000, cost: 2500, stock: 50 },
+            { id: 8, name: "Bodrex Flu & Batuk", desc: "1 Papan.", price: 3000, cost: 2240, stock: 40 },
+            { id: 9, name: "Bodrexin", desc: "1 Pack.", price: 5500, cost: 4600, stock: 20 },
+            { id: 10, name: "Ctm", desc: "1 Pack.", price: 1500, cost: 900, stock: 20 },
+            { id: 11, name: "Decolgen", desc: "1 Strip.", price: 3000, cost: 2500, stock: 20 },
+            { id: 12, name: "Entrostop", desc: "1 Pack.", price: 18000, cost: 16500, stock: 35 },
+            { id: 13, name: "Hansaplast", desc: "1 Pack.", price: 34000, cost: 29000, stock: 15 },
+            { id: 14, name: "Komix", desc: "1 Pack.", price: 46000, cost: 44000, stock: 10 },
+            { id: 15, name: "Konidin", desc: "1 Papan.", price: 3000, cost: 2500, stock: 50 },
+            { id: 16, name: "Koyo Cabe", desc: "1 Pack.", price: 12000, cost: 11500, stock: 30 },
+            { id: 17, name: "Mixagrip Flu", desc: "1 Papan.", price: 3500, cost: 3000, stock: 45 },
+            { id: 18, name: "Mixagrip Flu & Batuk", desc: "1 Papan.", price: 4000, cost: 3300, stock: 40 },
+            { id: 19, name: "Madu Tj", desc: "1 Pack.", price: 10000, cost: 9000, stock: 20 },
+            { id: 20, name: "Menara 5", desc: "1 Pack.", price: 31000, cost: 30000, stock: 20 },
+            { id: 21, name: "Oskadon", desc: "1 Strip.", price: 2500, cost: 2000, stock: 50 },
+            { id: 22, name: "Oskadon Sp", desc: "1 Strip.", price: 2500, cost: 1700, stock: 50 },
+            { id: 23, name: "Paramex", desc: "1 Papan.", price: 3000, cost: 2300, stock: 50 },
+            { id: 24, name: "Panadol", desc: "1 Strip.", price: 12000, cost: 11300, stock: 60 },
+            { id: 25, name: "Paracetamol", desc: "1 Strip.", price: 2500, cost: 1600, stock: 60 },
+            { id: 26, name: "Ponstan", desc: "1 Strip.", price: 34000, cost: 32000, stock: 30 },
+            { id: 27, name: "Promag", desc: "1 Papan.", price: 9000, cost: 8300, stock: 30 },
+            { id: 28, name: "Procold Flu", desc: "1 Papan.", price: 5000, cost: 4500, stock: 40 },
+            { id: 29, name: "Pil Atom", desc: "1 Papan.", price: 65000, cost: 60000, stock: 50 },
+            { id: 30, name: "Rheumacyl", desc: "1 Pack.", price: 10000, cost: 9000, stock: 25 },
+            { id: 31, name: "Salonpas", desc: "1 Pack.", price: 8000, cost: 7000, stock: 30 }
+        ];
+
+        let cart = {};
+
+        function getProducts() {
+            const saved = localStorage.getItem("data_produk_obat");
+            if (!saved) {
+                localStorage.setItem("data_produk_obat", JSON.stringify(initialProducts));
+                return initialProducts;
+            }
+            
+            let currentProducts = JSON.parse(saved);
+
+            initialProducts.forEach(initP => {
+                const index = currentProducts.findIndex(p => p.id === initP.id);
+                if (index !== -1) {
+                    currentProducts[index].price = initP.price;
+                    currentProducts[index].cost = initP.cost;
+                    currentProducts[index].name = initP.name;
+                    currentProducts[index].desc = initP.desc;
+                } else {
+                    currentProducts.push(initP);
+                }
+            });
+
+            localStorage.setItem("data_produk_obat", JSON.stringify(currentProducts));
+            return currentProducts;
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const savedStore = localStorage.getItem("nama_toko_aktif");
+            if (savedStore) document.getElementById("store-name").value = savedStore;
+        });
+
+        function saveStoreName() {
+            localStorage.setItem("nama_toko_aktif", document.getElementById("store-name").value);
+        }
+
+        function renderProducts() {
+            let products = getProducts();
+            const container = document.getElementById("menu-grid");
+            const searchQuery = document.getElementById("search-product").value.toLowerCase();
+
+            // 1. Filter produk berdasarkan kata kunci di search bar
+            products = products.filter(p => p.name.toLowerCase().includes(searchQuery));
+
+            // 2. Sortir produk secara otomatis A-Z di belakang layar (tanpa UI)
+            products.sort((a, b) => a.name.localeCompare(b.name));
+
+            container.innerHTML = "";
+
+            if (products.length === 0) {
+                container.innerHTML = `<p style="text-align:center; color:#888; margin-top:20px;">Produk tidak ditemukan.</p>`;
+                updateTotal();
+                return;
+            }
+
+            products.forEach(product => {
+                const qty = cart[product.id] || 0;
+                const isMax = qty >= product.stock;
+                const card = document.createElement("div");
+                card.className = "card";
+                card.innerHTML = `
+                    <h3 class="card-title">${product.name}</h3>
+                    <p class="card-desc">${product.desc}</p>
+                    <div class="card-stock">Sisa Stok: ${product.stock}</div>
+                    <div class="card-price">Rp${product.price.toLocaleString('id-ID')}</div>
+                    <div class="qty-control">
+                        <button class="qty-btn" onclick="updateQty(${product.id}, -1)">-</button>
+                        <span class="qty-number">${qty}</span>
+                        <button class="qty-btn" onclick="updateQty(${product.id}, 1)" ${isMax ? 'disabled' : ''}>+</button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+
+            updateTotal();
+        }
+
+        function updateQty(productId, change) {
+            const products = getProducts();
+            const product = products.find(p => p.id === productId);
+            const currentQty = cart[productId] || 0;
+            const newQty = currentQty + change;
+
+            if (newQty > product.stock) return;
+
+            if (newQty > 0) cart[productId] = newQty;
+            else delete cart[productId];
+
+            renderProducts();
+        }
+
+        function updateTotal() {
+            const products = getProducts();
+            let total = 0, itemCount = 0;
+
+            for (const id in cart) {
+                const product = products.find(p => p.id == id);
+                if (product) {
+                    total += product.price * cart[id];
+                    itemCount += cart[id];
+                }
+            }
+
+            document.getElementById("total-price").innerText = `Rp${total.toLocaleString('id-ID')}`;
+            document.getElementById("btn-confirm").disabled = itemCount === 0;
+        }
+
+        function konfirmasiPesanan() {
+            let products = getProducts();
+            const itemsOrdered = [];
+            let totalAmount = 0, totalCost = 0;
+
+            for (const id in cart) {
+                const product = products.find(p => p.id == id);
+                if (product) {
+                    const qtyOrdered = cart[id];
+                    const subtotal = product.price * qtyOrdered;
+                    const subcost = product.cost * qtyOrdered;
+
+                    itemsOrdered.push({
+                        id: product.id, name: product.name, price: product.price,
+                        cost: product.cost, qty: qtyOrdered, subtotal, subcost
+                    });
+
+                    totalAmount += subtotal;
+                    totalCost += subcost;
+                    product.stock -= qtyOrdered;
+                }
+            }
+
+            if (itemsOrdered.length === 0) return;
+
+            localStorage.setItem("data_produk_obat", JSON.stringify(products));
+
+            const inputStore = document.getElementById("store-name").value.trim();
+            const storeName = inputStore !== "" ? inputStore : "TOKO OBAT";
+            const storePrefix = storeName.toUpperCase().replace(/\s+/g, '-');
+
+            const history = JSON.parse(localStorage.getItem("riwayat_penjualan")) || [];
+            const nextNumber = history.length + 1;
+            const formattedNumber = String(nextNumber).padStart(3, '0');
+
+            const newTransaction = {
+                id: `${storePrefix}-${formattedNumber}`,
+                storeName: storeName,
+                date: new Date().toLocaleString("id-ID"),
+                items: itemsOrdered,
+                total: totalAmount,
+                totalCost: totalCost,
+                profit: totalAmount - totalCost
+            };
+
+            history.unshift(newTransaction);
+            localStorage.setItem("riwayat_penjualan", JSON.stringify(history));
+            window.location.href = "riwayat.html";
+        }
+
+        renderProducts();
+    </script>
+</body>
+</html>

@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Riwayat Penjualan Obat</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333333;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Navbar */
+        .navbar {
+            text-align: center;
+            padding: 10px;
+            background-color: #ffffff;
+            border-bottom: 2px solid #cccccc;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .nav-title {
+            font-size: 25px;
+            font-weight: bold;
+            padding-bottom: 15px;
+            color: #1b048f;
+        }
+        .nav-link {
+            margin: 5px;
+            text-decoration: none;
+            color: #1b048f;
+            border: 1px solid #1b048f;
+            border-radius: 10px;
+            padding: 6px 10px;
+            font-weight: bold;
+            display: inline-block;
+        }
+        .nav-link.active, .nav-link:hover {
+            color: white;
+            background-color: #1b048f;
+        }
+
+        /* Container Riwayat */
+        .history-container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 0 15px 40px 15px;
+        }
+
+        /* Card Ringkasan Laba */
+        .summary-card {
+            background-color: #ffffff;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            border: 1px solid #e0e0e0;
+        }
+        .summary-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #1b048f;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 8px;
+        }
+        .summary-grid {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            text-align: center;
+        }
+        .summary-item {
+            flex: 1;
+            padding: 10px;
+            background: #f9f9f9;
+            border-radius: 8px;
+        }
+        .summary-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        .summary-value {
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .text-omset { color: #2196F3; }
+        .text-modal { color: #f44336; }
+        .text-laba { color: #4CAF50; }
+
+        /* Title Header */
+        .history-header h2 {
+            margin: 0 0 15px 0;
+            font-size: 18px;
+            color: #222;
+        }
+
+        /* Card Transaksi */
+        .history-card {
+            background-color: #ffffff;
+            border-radius: 12px;
+            padding: 18px 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            border: 1px solid #e0e0e0;
+        }
+        .trx-header {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px dashed #cccccc;
+            padding-bottom: 10px;
+            margin-bottom: 12px;
+        }
+        .trx-id {
+            font-weight: bold;
+            color: #1b048f;
+        }
+        .trx-date {
+            font-size: 13px;
+            color: #777777;
+        }
+
+        /* List Items */
+        .item-list {
+            margin-bottom: 12px;
+        }
+        .item-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            margin-bottom: 6px;
+        }
+        .item-name {
+            color: #333333;
+        }
+        .item-subtotal {
+            font-weight: bold;
+            color: #555555;
+        }
+
+        /* Total Pembayaran & Laba per Transaksi */
+        .trx-footer {
+            border-top: 1px solid #eeeeee;
+            padding-top: 10px;
+        }
+        .footer-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 15px;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+        .profit-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            color: #4CAF50;
+            font-weight: bold;
+        }
+
+        /* Area Tombol Hapus di Bawah */
+        .action-footer {
+            text-align: center;
+            margin-top: 25px;
+        }
+        .btn-clear {
+            background-color: #d9534f;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            width: 100%;
+            max-width: 300px;
+        }
+        .btn-clear:hover {
+            background-color: #c9302c;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 50px 20px;
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #e0e0e0;
+            color: #777777;
+        }
+        .footer {
+        text-align: center;
+        padding: 15px 10px;
+        background-color: #ffffff;
+        border-top: 1px solid #e0e0e0;
+        color: #666666;
+        font-size: 13px;
+        margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="navbar">
+        <div class="nav-title">Data Transaksi</div>
+        <a href="index.html" class="nav-link">Produk</a>
+        <a href="riwayat.html" class="nav-link active">Riwayat</a>
+        <a href="modal.html" class="nav-link">Cost</a>
+        <a href="stok.html" class="nav-link">Stok</a>
+    </div>
+
+    <div class="history-container">
+        <!-- Ringkasan Keuangan -->
+        <div class="summary-card">
+            <div class="summary-title">Laporan Keuangan Keseluruhan</div>
+            <div class="summary-grid">
+                <div class="summary-item">
+                    <div class="summary-label">Total Omset</div>
+                    <div id="total-omset" class="summary-value text-omset">Rp0</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-label">Total Modal</div>
+                    <div id="total-modal" class="summary-value text-modal">Rp0</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-label">Nett</div>
+                    <div id="total-laba" class="summary-value text-laba">Rp0</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="history-header">
+            <h2>Daftar Transaksi</h2>
+        </div>
+
+        <div id="history-list"></div>
+
+        <div id="action-footer" class="action-footer"></div>
+    </div>
+
+    <div class="footer">
+        <p>&copy; 2026 Aplikasi Kasir Obat By Fairly Aryasatya. All rights reserved.</p>
+    </div>
+
+    <script>
+        function renderHistory() {
+            const container = document.getElementById("history-list");
+            const footerContainer = document.getElementById("action-footer");
+            const history = JSON.parse(localStorage.getItem("riwayat_penjualan")) || [];
+
+            let grandOmset = 0;
+            let grandModal = 0;
+            let grandLaba = 0;
+
+            if (history.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <p>Belum ada riwayat transaksi.</p>
+                    </div>
+                `;
+                footerContainer.innerHTML = "";
+                document.getElementById("total-omset").innerText = "Rp0";
+                document.getElementById("total-modal").innerText = "Rp0";
+                document.getElementById("total-laba").innerText = "Rp0";
+                return;
+            }
+
+            container.innerHTML = "";
+
+            history.forEach(trx => {
+                const omset = trx.total || 0;
+                const modal = trx.totalCost || 0;
+                const laba = trx.profit !== undefined ? trx.profit : (omset - modal);
+
+                grandOmset += omset;
+                grandModal += modal;
+                grandLaba += laba;
+
+                const card = document.createElement("div");
+                card.className = "history-card";
+
+                let itemsHTML = "";
+                trx.items.forEach(item => {
+                    itemsHTML += `
+                        <div class="item-row">
+                            <span class="item-name">${item.name} (x${item.qty})</span>
+                            <span class="item-subtotal">Rp${item.subtotal.toLocaleString('id-ID')}</span>
+                        </div>
+                    `;
+                });
+
+                card.innerHTML = `
+                    <div class="trx-header">
+                        <span class="trx-id">${trx.id}</span>
+                        <span class="trx-date">${trx.date}</span>
+                    </div>
+                    <div class="item-list">
+                        ${itemsHTML}
+                    </div>
+                    <div class="trx-footer">
+                        <div class="footer-row">
+                            <span>Total Bayar</span>
+                            <span style="color: #1b048f;">Rp${omset.toLocaleString('id-ID')}</span>
+                        </div>
+                        <div class="profit-row">
+                            <span>Nett</span>
+                            <span>+Rp${laba.toLocaleString('id-ID')}</span>
+                        </div>
+                    </div>
+                `;
+
+                container.appendChild(card);
+            });
+
+            document.getElementById("total-omset").innerText = `Rp${grandOmset.toLocaleString('id-ID')}`;
+            document.getElementById("total-modal").innerText = `Rp${grandModal.toLocaleString('id-ID')}`;
+            document.getElementById("total-laba").innerText = `Rp${grandLaba.toLocaleString('id-ID')}`;
+
+            footerContainer.innerHTML = `
+                <button class="btn-clear" onclick="clearHistory()">Hapus Semua Riwayat</button>
+            `;
+        }
+
+        function clearHistory() {
+            if (confirm("Apakah Anda yakin ingin menghapus semua riwayat transaksi?")) {
+                localStorage.removeItem("riwayat_penjualan");
+                renderHistory();
+            }
+        }
+
+        renderHistory();
+    </script>
+</body>
+</html>

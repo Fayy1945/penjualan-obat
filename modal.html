@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modal Penjualan Obat</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333333;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Navbar */
+        .navbar {
+            text-align: center;
+            padding: 10px;
+            background-color: #ffffff;
+            border-bottom: 2px solid #cccccc;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .nav-title {
+            font-size: 25px;
+            font-weight: bold;
+            padding-bottom: 15px;
+            color: #1b048f;
+        }
+        .nav-link {
+            margin: 5px;
+            text-decoration: none;
+            color: #1b048f;
+            border: 1px solid #1b048f;
+            border-radius: 10px;
+            padding: 6px 10px;
+            font-weight: bold;
+            display: inline-block;
+        }
+        .nav-link.active, .nav-link:hover {
+            color: white;
+            background-color: #1b048f;
+        }
+
+        .cost-container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 0 15px 100px 15px;
+        }
+        .card {
+            background-color: #ffffff;
+            border-radius: 12px;
+            padding: 18px 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            border: 1px solid #e0e0e0;
+        }
+        .card-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 0 0 6px 0;
+            color: #222;
+        }
+        .card-desc {
+            font-size: 13px;
+            color: #666;
+            margin: 0 0 10px 0;
+        }
+        .card-cost {
+            font-size: 15px;
+            font-weight: bold;
+            color: #d9534f;
+            margin: 0;
+        }
+        .footer {
+            text-align: center;
+            padding: 15px 10px;
+            background-color: #ffffff;
+            border-top: 1px solid #e0e0e0;
+            color: #666666;
+            font-size: 13px;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="navbar">
+        <div class="nav-title">Data Transaksi</div>
+        <a href="index.html" class="nav-link">Produk</a>
+        <a href="riwayat.html" class="nav-link">Riwayat</a>
+        <a href="modal.html" class="nav-link active">Cost</a>
+        <a href="stok.html" class="nav-link">Stok</a>
+    </div>
+
+    <div id="cost-grid" class="cost-container"></div>
+
+    <div class="footer">
+        <p>&copy; 2026 Aplikasi Kasir Obat By Fairly Aryasatya. All rights reserved.</p>
+    </div>
+
+    <script>
+        // Data bawaan awal
+        const defaultProducts = [
+            { id: 1, name: "Antalgin", desc: "1 Strip.", price: 4000, cost: 3000, stock: 50 },
+            { id: 2, name: "Antangin Dewasa", desc: "1 Pack.", price: 41000, cost: 39000, stock: 50 },
+            { id: 3, name: "Antangin Anak", desc: "1 Pack.", price: 11000, cost: 10500, stock: 50 },
+            { id: 4, name: "Antimo", desc: "1 Papan.", price: 6000, cost: 5500, stock: 50 },
+            { id: 5, name: "Bejo", desc: "1 Pack.", price: 31000, cost: 29000, stock: 50 },
+            { id: 6, name: "Bodrex", desc: "1 Pack.", price: 10000, cost: 8750, stock: 50 },
+            { id: 7, name: "Bodrex Extra", desc: "1 Strip.", price: 3000, cost: 2500, stock: 50 },
+            { id: 8, name: "Bodrex Flu & Batuk", desc: "1 Papan.", price: 3000, cost: 2240, stock: 50 },
+            { id: 9, name: "Bodrexin", desc: "1 Pack.", price: 5500, cost: 4600, stock: 50 },
+            { id: 10, name: "Ctm", desc: "1 Pack.", price: 1500, cost: 900, stock: 50 },
+            { id: 11, name: "Decolgen", desc: "1 Strip.", price: 3000, cost: 2500, stock: 50 },
+            { id: 12, name: "Entrostop", desc: "1 Pack.", price: 18000, cost: 16500, stock: 50 },
+            { id: 13, name: "Hansaplast", desc: "1 Pack.", price: 34000, cost: 29000, stock: 50 },
+            { id: 14, name: "Komix", desc: "1 Pack.", price: 46000, cost: 44000, stock: 50 },
+            { id: 15, name: "Konidin", desc: "1 Papan.", price: 3000, cost: 2500, stock: 50 },
+            { id: 16, name: "Koyo Cabe", desc: "1 Pack.", price: 12000, cost: 11500, stock: 50 },
+            { id: 17, name: "Mixagrip Flu", desc: "1 Papan.", price: 3500, cost: 3000, stock: 50 },
+            { id: 18, name: "Mixagrip Flu & Batuk", desc: "1 Papan.", price: 4000, cost: 3300, stock: 50 },
+            { id: 19, name: "Madu Tj", desc: "1 Pack.", price: 10000, cost: 9000, stock: 50 },
+            { id: 20, name: "Menara 5", desc: "1 Pack.", price: 31000, cost: 30000, stock: 50 },
+            { id: 21, name: "Oskadon", desc: "1 Strip.", price: 2500, cost: 2000, stock: 50 },
+            { id: 22, name: "Oskadon Sp", desc: "1 Strip.", price: 2500, cost: 1700, stock: 50 },
+            { id: 23, name: "Paramex", desc: "1 Papan.", price: 3000, cost: 2300, stock: 50 },
+            { id: 24, name: "Panadol", desc: "1 Strip.", price: 12000, cost: 11300, stock: 50 },
+            { id: 25, name: "Paracetamol", desc: "1 Strip.", price: 2500, cost: 1600, stock: 50 },
+            { id: 26, name: "Ponstan", desc: "1 Strip.", price: 34000, cost: 32000, stock: 50 },
+            { id: 27, name: "Promag", desc: "1 Papan.", price: 9000, cost: 8300, stock: 50 },
+            { id: 28, name: "Procold Flu", desc: "1 Papan.", price: 5000, cost: 4500, stock: 50 },
+            { id: 29, name: "Pil Atom", desc: "1 Papan.", price: 65000, cost: 60000, stock: 50 },
+            { id: 30, name: "Rheumacyl", desc: "1 Pack.", price: 10000, cost: 9000, stock: 50 },
+            { id: 31, name: "Salonpas", desc: "1 Pack.", price: 8000, cost: 7000, stock: 50 }
+        ];
+
+        function renderCosts() {
+            const container = document.getElementById("cost-grid");
+            
+            // Ambil dari localStorage (jika ada), kalau belum ada pakai defaultProducts
+            let products = JSON.parse(localStorage.getItem("data_produk_obat"));
+            if (!products || products.length === 0) {
+                products = defaultProducts;
+                localStorage.setItem("data_produk_obat", JSON.stringify(defaultProducts));
+            }
+
+            // Urutkan produk berdasarkan nama secara Alfabetis (A ke Z)
+            const sortedProducts = products.slice().sort((a, b) => 
+                a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' })
+            );
+
+            container.innerHTML = "";
+
+            sortedProducts.forEach(product => {
+                const card = document.createElement("div");
+                card.className = "card";
+                card.innerHTML = `
+                    <h2 class="card-title">${product.name}</h2>
+                    <p class="card-desc">${product.desc}</p>
+                    <h3 class="card-cost">@ Rp${product.cost.toLocaleString('id-ID')}</h3>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        renderCosts();
+    </script>
+</body>
+</html>
